@@ -490,6 +490,24 @@ defineExpose({
   -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
   overflow-y: auto;
+  /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 255, 255, 0.3) rgba(0, 0, 0, 0.2);
+}
+
+/* WebKit / Blink scrollbars on the overlay */
+.dialog-overlay::-webkit-scrollbar {
+  width: 6px;
+}
+.dialog-overlay::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+.dialog-overlay::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 255, 0.3);
+  border-radius: 3px;
+}
+.dialog-overlay::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 255, 255, 0.5);
 }
 
 /* ----- Card ----- */
@@ -666,6 +684,24 @@ defineExpose({
   resize: vertical;
   min-height: 72px;
   font-family: inherit;
+  /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 255, 255, 0.3) rgba(0, 0, 0, 0.2);
+}
+
+/* WebKit / Blink scrollbars inside the textarea */
+.dialog-textarea::-webkit-scrollbar {
+  width: 6px;
+}
+.dialog-textarea::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+.dialog-textarea::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 255, 0.3);
+  border-radius: 3px;
+}
+.dialog-textarea::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 255, 255, 0.5);
 }
 
 .dialog-field.has-error .dialog-input {
