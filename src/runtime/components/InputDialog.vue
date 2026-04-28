@@ -472,18 +472,24 @@ defineExpose({
   opacity: 0;
 }
 
-/* ----- Overlay ----- */
+/* ----- Overlay -----
+ * The overlay carries the scroll, NOT the card. The card stays
+ * `overflow: visible` so the icon-circle can protrude above it.
+ * `safe center` keeps short dialogs vertically centered while
+ * letting tall forms align to the top so the icon stays in view.
+ */
 .dialog-overlay {
   position: fixed;
   inset: 0;
   z-index: 10000;
   display: flex;
-  align-items: center;
+  align-items: safe center;
   justify-content: center;
-  padding: 16px;
+  padding: 48px 16px;
   background: rgba(15, 18, 24, 0.78);
   -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
+  overflow-y: auto;
 }
 
 /* ----- Card ----- */
@@ -519,8 +525,10 @@ defineExpose({
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   box-sizing: border-box;
-  max-height: calc(100vh - 64px);
-  overflow-y: auto;
+  /* `overflow: visible` (default) — must NOT be `auto`/`hidden` or the
+   * top icon-circle (positioned at `top: -32px`) gets clipped. The
+   * overlay handles scrolling for long forms. */
+  overflow: visible;
 }
 
 .dialog-card:focus { outline: none; }
