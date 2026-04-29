@@ -1,6 +1,6 @@
 {
   "name": "nuxt-input-dialog",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A beautiful, framework-agnostic input dialog module for Nuxt 3 and Nuxt 4 — text, password, number, textarea, select, and autocomplete fields with validation. No Vuetify required.",
   "repository": {
     "type": "git",
