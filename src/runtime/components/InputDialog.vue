@@ -50,14 +50,21 @@
                 v-for="field in fields"
                 :key="field.key"
                 class="dialog-field"
-                :class="{ 'has-error': !!fieldErrors[field.key] }"
+                :class="[
+                  `is-${field.type}`,
+                  {
+                    'has-value': isFilled(field),
+                    'has-error': !!fieldErrors[field.key],
+                  },
+                ]"
               >
-                <label
-                  class="dialog-field-label"
-                  :for="`${idBase}-${field.key}`"
-                >
-                  {{ field.label }}
-                </label>
+                <!--
+                  The control comes BEFORE the label so the floating-label
+                  CSS can use `:focus-within` + `.has-value` to push the
+                  label up and shrink it. The label is rendered as a
+                  visual placeholder when empty, and animates to a small
+                  legend when the field is focused or filled.
+                -->
 
                 <!-- text / password / email / number -->
                 <input
@@ -82,28 +89,37 @@
                   @blur="validateField(field)"
                 />
 
-                <!-- select -->
+                <!-- select — click-to-open dropdown, no typing -->
                 <DropdownPicker
                   v-else-if="field.type === 'select'"
                   :id="`${idBase}-${field.key}`"
                   :model-value="values[field.key]"
                   :items="(field.items ?? []) as unknown[]"
-                  :placeholder="field.placeholder ?? 'Select…'"
+                  :placeholder="''"
+                  :searchable="false"
                   :allow-create="false"
                   @update:model-value="(v) => { values[field.key] = v; validateField(field) }"
                 />
 
-                <!-- autocomplete -->
+                <!-- autocomplete — typing-to-filter, optionally creates new -->
                 <DropdownPicker
                   v-else-if="field.type === 'autocomplete'"
                   :id="`${idBase}-${field.key}`"
                   :model-value="values[field.key]"
                   :items="(field.items ?? []) as unknown[]"
-                  :placeholder="field.placeholder ?? 'Search…'"
+                  :placeholder="''"
+                  :searchable="true"
                   :allow-create="!!field.createNew"
                   :format-create="(raw) => formatCreate(field, raw)"
                   @update:model-value="(v) => { values[field.key] = v; validateField(field) }"
                 />
+
+                <label
+                  class="dialog-field-label"
+                  :for="`${idBase}-${field.key}`"
+                >
+                  {{ field.label }}
+                </label>
 
                 <p
                   v-if="field.hint && !fieldErrors[field.key]"
@@ -362,6 +378,14 @@ const getButtonClass = (button: InputDialogButton): string[] => {
 
 const formatCreate = (field: InputField, raw: string): string =>
   formatCreateNewValue(field, raw)
+
+const isFilled = (field: InputField): boolean => {
+  const v = values[field.key]
+  if (v === null || v === undefined) return false
+  if (typeof v === 'string') return v.length > 0
+  if (typeof v === 'number') return Number.isFinite(v)
+  return true
+}
 
 const validateField = (field: InputField): boolean => {
   const value = values[field.key]
@@ -641,21 +665,28 @@ defineExpose({
 }
 
 .dialog-field {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 6px;
 }
 
-.dialog-field-label {
-  font-size: 13px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.78);
-  letter-spacing: 0.01em;
-}
-
+/*
+ * Floating-label inputs.
+ *
+ * The label is positioned absolutely on top of the input. Default state
+ * (empty + unfocused): vertically centered, looks like a placeholder.
+ * Focused or filled state: shrinks and slides up to the top of the
+ * input, sits above the value as a small legend in the active accent
+ * color.
+ *
+ * The control is rendered BEFORE the label in the DOM so that
+ * `:focus-within` on the parent + the `.has-value` class drive the
+ * floating state via plain CSS — no JS for the animation.
+ */
 .dialog-input {
   width: 100%;
-  padding: 11px 14px;
+  height: 56px;
+  padding: 22px 14px 8px;
   background: rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(127, 157, 187, 0.5);
   border-radius: 8px;
@@ -666,7 +697,15 @@ defineExpose({
   box-sizing: border-box;
 }
 
+/* The native placeholder is hidden by default so the label can act
+ * as the visual placeholder. It shows only when the field is focused
+ * (via the float state below). */
 .dialog-input::placeholder {
+  color: transparent;
+  transition: color 0.15s ease;
+}
+
+.dialog-input:focus::placeholder {
   color: rgba(255, 255, 255, 0.4);
 }
 
@@ -680,9 +719,12 @@ defineExpose({
   background: rgba(0, 0, 0, 0.4);
 }
 
+/* Textarea — taller, label sits at top instead of vertically centered */
 .dialog-textarea {
+  height: auto;
+  min-height: 96px;
+  padding: 26px 14px 8px;
   resize: vertical;
-  min-height: 72px;
   font-family: inherit;
   /* Firefox */
   scrollbar-width: thin;
@@ -704,26 +746,90 @@ defineExpose({
   background: rgba(0, 255, 255, 0.5);
 }
 
+/* The label — default ("placeholder") position */
+.dialog-field-label {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  transform: translateY(-50%);
+  font-size: 14px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.55);
+  letter-spacing: 0.01em;
+  pointer-events: none;
+  background: transparent;
+  transition:
+    top 0.18s ease,
+    transform 0.18s ease,
+    font-size 0.18s ease,
+    color 0.18s ease,
+    font-weight 0.18s ease;
+}
+
+/* Textarea label sits at the top instead of vertically centered */
+.dialog-field.is-textarea .dialog-field-label {
+  top: 18px;
+  transform: none;
+}
+
+/* RTL — anchor the label to the right edge */
+.dialog-card[dir='rtl'] .dialog-field-label {
+  left: auto;
+  right: 14px;
+}
+
+/*
+ * Floating state — when the field is focused or has a value, the label
+ * slides up and shrinks. `:focus-within` covers nested controls
+ * (the dropdown picker's input). `.has-value` is set by InputDialog
+ * when the field's value is non-empty.
+ */
+.dialog-field:focus-within .dialog-field-label,
+.dialog-field.has-value .dialog-field-label {
+  top: 8px;
+  transform: none;
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(0, 255, 255, 0.85);
+  letter-spacing: 0.04em;
+}
+
+/* Active focus highlight (slightly stronger) */
+.dialog-field:focus-within .dialog-field-label {
+  color: #00ffff;
+}
+
+/* ----- Error state ----- */
 .dialog-field.has-error .dialog-input {
   border-color: #ef5350;
 }
 .dialog-field.has-error .dialog-input:focus {
   border-color: #ef5350;
 }
-.dialog-field.has-error .dialog-field-label {
+.dialog-field.has-error .dialog-field-label,
+.dialog-field.has-error:focus-within .dialog-field-label {
   color: #ef5350;
 }
 
+/* Dropdown error border passes through the trigger inside */
+.dialog-field.has-error :deep(.dd-trigger) {
+  border-color: #ef5350;
+}
+.dialog-field.has-error:focus-within :deep(.dd-trigger) {
+  border-color: #ef5350;
+}
+
+/* ----- Hint / per-field error messages ----- */
 .dialog-field-hint {
   font-size: 12px;
-  margin: 0;
+  margin: 6px 0 0;
   color: rgba(255, 255, 255, 0.55);
 }
 
 .dialog-field-error {
   font-size: 12px;
   font-weight: 500;
-  margin: 0;
+  margin: 6px 0 0;
   color: #ef5350;
 }
 

@@ -83,7 +83,7 @@ describe('InputDialog', () => {
       expect(wrapper.find('[data-dropdown-trigger]').exists()).toBe(true)
     })
 
-    it('renders an autocomplete with input field', () => {
+    it('renders an autocomplete with a search input field', () => {
       const wrapper = renderField({
         key: 'p',
         type: 'autocomplete',
@@ -91,8 +91,34 @@ describe('InputDialog', () => {
         items: ['/a/', '/b/'],
         createNew: 'path',
       })
-      // Autocomplete uses an input inside the trigger for typing
-      expect(wrapper.find('.dd-input-create').exists()).toBe(true)
+      // Autocomplete uses an <input> inside the trigger for typing
+      expect(wrapper.find('.dd-input-search').exists()).toBe(true)
+    })
+
+    it('autocomplete is searchable even when createNew is false', () => {
+      const wrapper = renderField({
+        key: 'fruit',
+        type: 'autocomplete',
+        label: 'Fruit',
+        items: ['Apple', 'Banana'],
+        createNew: false,
+      })
+      // The user must still be able to type to filter — even without
+      // the create-new option enabled. This is the key distinction
+      // between `select` and `autocomplete`.
+      expect(wrapper.find('.dd-input-search').exists()).toBe(true)
+    })
+
+    it('select renders without a search input', () => {
+      const wrapper = renderField({
+        key: 'opt',
+        type: 'select',
+        label: 'Opt',
+        items: ['a', 'b'],
+      })
+      // Select has no typing input — just a static label/value.
+      expect(wrapper.find('.dd-input-search').exists()).toBe(false)
+      expect(wrapper.find('[data-dropdown-trigger]').exists()).toBe(true)
     })
   })
 

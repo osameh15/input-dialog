@@ -2,13 +2,13 @@
   <div
     ref="rootRef"
     class="dd-root"
-    :class="{ 'is-open': isOpen, 'is-create-mode': allowCreate }"
+    :class="{ 'is-open': isOpen, 'is-searchable': searchable }"
   >
     <div
       :id="id"
       ref="triggerRef"
       data-dropdown-trigger
-      tabindex="0"
+      :tabindex="searchable ? -1 : 0"
       role="combobox"
       :aria-expanded="isOpen"
       aria-haspopup="listbox"
@@ -17,12 +17,12 @@
       @keydown="onTriggerKeydown"
     >
       <input
-        v-if="allowCreate"
+        v-if="searchable"
         ref="inputRef"
         v-model="searchText"
         type="text"
         :placeholder="placeholder"
-        class="dd-input dd-input-create"
+        class="dd-input dd-input-search"
         @focus="open"
         @input="onInput"
         @keydown.stop="onInputKeydown"
@@ -141,7 +141,16 @@ const props = withDefaults(
     modelValue: unknown
     items: unknown[]
     placeholder?: string
-    /** When true, typing creates a "Create new" entry. */
+    /**
+     * When true, the trigger renders an `<input>` for typing. The list
+     * filters as the user types. Used for `autocomplete` field type.
+     */
+    searchable?: boolean
+    /**
+     * When true, typing a value not in `items` surfaces a "Create" item
+     * at the top of the dropdown. Independent of `searchable` — usually
+     * paired with it (autocomplete + createNew). Ignored when not searchable.
+     */
     allowCreate?: boolean
     /** Optional formatter for the new value before commit. */
     formatCreate?: (raw: string) => string
@@ -149,6 +158,7 @@ const props = withDefaults(
   {
     id: undefined,
     placeholder: 'Select…',
+    searchable: false,
     allowCreate: false,
     formatCreate: undefined,
   },
@@ -164,15 +174,17 @@ const isOpen = ref(false)
 const searchText = ref('')
 const activeIndex = ref(-1)
 
+// Keep searchText in sync with the bound value when searchable.
 watch(() => props.modelValue, (v) => {
-  if (props.allowCreate && typeof v === 'string') {
+  if (props.searchable && typeof v === 'string') {
     searchText.value = v
   }
 }, { immediate: true })
 
+// Items filtered by the current search text (only when searchable).
 const filtered = computed<DisplayItem[]>(() => {
   const items = props.items ?? []
-  if (!props.allowCreate || !searchText.value) {
+  if (!props.searchable || !searchText.value) {
     return items.map(value => ({ value, isCreate: false }))
   }
   const needle = searchText.value.toLowerCase()
@@ -182,14 +194,15 @@ const filtered = computed<DisplayItem[]>(() => {
 })
 
 const displayItems = computed<DisplayItem[]>(() => {
-  if (!props.allowCreate) return filtered.value
+  // Without create-new, just show the filtered items.
+  if (!props.searchable || !props.allowCreate) return filtered.value
   if (!searchText.value) return filtered.value
 
   const formatted = props.formatCreate
     ? props.formatCreate(searchText.value)
     : searchText.value
 
-  // Surface "Create" only if the formatted value isn't already in items
+  // Surface "Create" only if the formatted value isn't already in items.
   const exists = props.items.some(v => String(v) === formatted)
   if (exists) return filtered.value
 
@@ -211,13 +224,13 @@ const toggle = async (): Promise<void> => {
   else {
     open()
     await nextTick()
-    inputRef.value?.focus()
+    if (props.searchable) inputRef.value?.focus()
   }
 }
 
 const pick = (item: DisplayItem): void => {
   emit('update:modelValue', item.value)
-  if (props.allowCreate) {
+  if (props.searchable) {
     searchText.value = String(item.value)
   }
   close()
@@ -259,7 +272,9 @@ const onTriggerKeydown = (e: KeyboardEvent): void => {
     e.preventDefault()
     if (!isOpen.value) {
       open()
-      nextTick(() => inputRef.value?.focus())
+      if (props.searchable) {
+        nextTick(() => inputRef.value?.focus())
+      }
     }
     else if (e.key === 'ArrowDown') {
       activeIndex.value = Math.min(activeIndex.value + 1, displayItems.value.length - 1)
@@ -302,8 +317,8 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 8px;
   width: 100%;
-  min-height: 44px;
-  padding: 10px 14px;
+  height: 56px;
+  padding: 22px 14px 8px;
   background: rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(127, 157, 187, 0.5);
   border-radius: 8px;
@@ -314,7 +329,7 @@ onBeforeUnmount(() => {
   box-sizing: border-box;
 }
 
-.dd-root.is-create-mode .dd-trigger {
+.dd-root.is-searchable .dd-trigger {
   cursor: text;
 }
 
@@ -329,7 +344,7 @@ onBeforeUnmount(() => {
   background: rgba(0, 0, 0, 0.4);
 }
 
-.dd-input-create {
+.dd-input-search {
   flex: 1;
   background: transparent;
   border: 0;
@@ -340,8 +355,10 @@ onBeforeUnmount(() => {
   padding: 0;
 }
 
-.dd-input-create::placeholder {
-  color: rgba(255, 255, 255, 0.4);
+/* Hide the search input's own placeholder — the field's floating
+ * label takes that role. */
+.dd-input-search::placeholder {
+  color: transparent;
 }
 
 .dd-value,
@@ -354,8 +371,9 @@ onBeforeUnmount(() => {
   white-space: nowrap;
 }
 
+/* Static placeholder hidden in favor of the floating label */
 .dd-placeholder {
-  color: rgba(255, 255, 255, 0.4);
+  color: transparent;
 }
 
 .dd-caret {
