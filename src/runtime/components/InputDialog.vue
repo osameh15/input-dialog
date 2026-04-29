@@ -747,9 +747,13 @@ defineExpose({
 
 /* ----- Label -----
  *
- * Default ("placeholder") position: vertically centered inside the
- * input (`top: 50%` is the input box's vertical center because the
- * field wrapper has no padding-top).
+ * Default ("placeholder") position: vertically centered on the INPUT
+ * (input is 56px tall → its center is at y = 28px from the field's
+ * top edge). We use a fixed pixel value rather than `top: 50%` so the
+ * label stays anchored to the input's center even when the field
+ * contains additional flex children below the input (a hint, an
+ * error, etc.) — without this fix, `top: 50%` of the FIELD's total
+ * height drifts down once a hint is rendered.
  *
  * Floated position: `top: 8px` — a small label at the top of the
  * input, inside the box. The input's `padding-top: 22px` ensures
@@ -757,7 +761,7 @@ defineExpose({
  */
 .dialog-field-label {
   position: absolute;
-  top: 50%;
+  top: 28px;
   left: 14px;
   transform: translateY(-50%);
   max-width: calc(100% - 28px);
