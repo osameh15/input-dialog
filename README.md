@@ -5,6 +5,8 @@
 
 A beautiful, zero-dependency input dialog module for **Nuxt 3 and Nuxt 4** — no Vuetify or icon-font required. Drop it in, call `useInputDialog().promptText(...)`, await the typed value.
 
+![Rename file dialog with a single text input — floating label inside the input box, OK / Cancel buttons](https://raw.githubusercontent.com/osameh15/input-dialog/main/docs/images/text.png)
+
 - 🎨 **Polished look** — dark radial gradient, colored borders per type, decorative top icon, blurred backdrop
 - 🧩 **Standalone** — no Vuetify, no MDI, no extra CSS framework
 - ⚡️ **Auto-mounted** — no boilerplate, just call `useInputDialog().promptText('Rename', 'New name')`
@@ -96,6 +98,10 @@ const onSignup = async () => {
 </script>
 ```
 
+The bundled playground exercises every feature — convenience methods, custom `show()`, validation, autocomplete with create-new, multi-field forms, and Persian RTL:
+
+![Quick demo page with the six convenience-method buttons and the custom show() controls](https://raw.githubusercontent.com/osameh15/input-dialog/main/docs/images/QuickDemo.png)
+
 ---
 
 ## Module options
@@ -172,6 +178,17 @@ const file = await dialog.promptSaveAs('document', { extensions: ['.md', '.txt']
 const values: Record<string, unknown> | null = await dialog.promptForm('Title', [...fields])
 ```
 
+<table>
+  <tr>
+    <td align="center"><strong>promptSaveAs</strong> (file name + extension select)</td>
+    <td align="center"><strong>promptForm</strong> (multi-field form)</td>
+  </tr>
+  <tr>
+    <td><img src="https://raw.githubusercontent.com/osameh15/input-dialog/main/docs/images/SaveAs.png" alt="Save As dialog with File Name 'document' and File Type '.md' selected" /></td>
+    <td><img src="https://raw.githubusercontent.com/osameh15/input-dialog/main/docs/images/Form.png" alt="Edit profile form with Full name, Email, Bio textarea, and Role select fields" /></td>
+  </tr>
+</table>
+
 ---
 
 ## Field types
@@ -204,6 +221,25 @@ interface InputField {
 | `select`      | Custom dropdown    | Single-select from `items` array                |
 | `autocomplete`| Custom search-box  | Filter `items`, optionally suggest a new value  |
 
+<table>
+  <tr>
+    <td align="center"><strong>password</strong> (required-rule error)</td>
+    <td align="center"><strong>number</strong></td>
+  </tr>
+  <tr>
+    <td><img src="https://raw.githubusercontent.com/osameh15/input-dialog/main/docs/images/password.png" alt="Password field with red 'Password is required' error" /></td>
+    <td><img src="https://raw.githubusercontent.com/osameh15/input-dialog/main/docs/images/number.png" alt="Number field — Quantity dialog with default value 1" /></td>
+  </tr>
+  <tr>
+    <td align="center"><strong>textarea</strong></td>
+    <td align="center"><strong>select</strong> (open dropdown)</td>
+  </tr>
+  <tr>
+    <td><img src="https://raw.githubusercontent.com/osameh15/input-dialog/main/docs/images/textArea.png" alt="Textarea field with multi-line input area" /></td>
+    <td><img src="https://raw.githubusercontent.com/osameh15/input-dialog/main/docs/images/select.png" alt="Select field with the dropdown open showing four theme colors" /></td>
+  </tr>
+</table>
+
 ---
 
 ## Validation rules
@@ -225,6 +261,8 @@ A rule is a function that takes the value and returns `true` (valid) or a `strin
 ```
 
 Rules run **on blur** (after the first interaction) and **on submit** (all fields). Field-level errors render below each field; a form-level error appears under the form when any rules fail on submit.
+
+![Username dialog showing the hint "3-20 chars, lowercase letters, numbers, underscores only" below the input](https://raw.githubusercontent.com/osameh15/input-dialog/main/docs/images/withHint.png)
 
 ---
 
@@ -252,6 +290,8 @@ Autocomplete fields can suggest creating a new value when the typed text isn't i
 ```
 
 When create-new mode is on, an extra "Create" item appears at the top of the dropdown with a `+` icon and a "New" badge. Press **Enter** in the input to commit the typed (formatted) value, or click the suggestion.
+
+![Autocomplete folder picker with "G" typed and a "Create G/" suggestion at the top of the dropdown with a NEW badge, followed by /var/log/ and /var/log/nginx/](https://raw.githubusercontent.com/osameh15/input-dialog/main/docs/images/autocomplete.png)
 
 ---
 
@@ -329,6 +369,8 @@ Two fonts loaded by default:
 ### Right-to-left support
 
 When the title, message, warning text, or any field's label/placeholder/hint contains Arabic / Persian script, the dialog auto-switches to `dir="rtl"`. Detection is per-instance — you can mix LTR and RTL dialogs in the same app without configuration.
+
+![Persian "تغییر نام فایل" rename dialog — RTL layout with ذخیره (Save) and انصراف (Cancel) buttons reversed and Shabnam font rendering](https://raw.githubusercontent.com/osameh15/input-dialog/main/docs/images/rtl.png)
 
 ### Manual mounting
 

@@ -76,15 +76,20 @@ The promise **always resolves** — never rejects. Cancel resolves with `{ actio
 
 | Field type   | Renders                                           |
 | ------------ | ------------------------------------------------- |
-| `text`       | `<input type="text">`                             |
-| `password`   | `<input type="password">`                         |
-| `email`      | `<input type="email">`                            |
-| `number`     | `<input type="number">`                           |
-| `textarea`   | `<textarea>`                                      |
-| `select`     | `<DropdownPicker :allow-create="false">`          |
-| `autocomplete`| `<DropdownPicker :allow-create="!!createNew">`   |
+| `text`       | `<input type="text">`                                                    |
+| `password`   | `<input type="password">`                                                |
+| `email`      | `<input type="email">`                                                   |
+| `number`     | `<input type="number">`                                                  |
+| `textarea`   | `<textarea>`                                                             |
+| `select`     | `<DropdownPicker :searchable="false" :allow-create="false">`             |
+| `autocomplete`| `<DropdownPicker :searchable="true" :allow-create="!!createNew">`       |
 
-Both `select` and `autocomplete` use the same internal `_DropdownPicker.vue` — the only difference is whether the `allowCreate` prop is true. When true, the trigger has a `<input>` instead of a static label, the dropdown filters items as you type, and a "Create" item appears at the top when the typed value isn't in the list.
+Both `select` and `autocomplete` use the same internal `_DropdownPicker.vue` with two independent props:
+
+- `searchable` — controls whether the trigger renders an `<input>` for typing. When `true`, the list filters as the user types. Used for `autocomplete`; always `false` for `select`.
+- `allowCreate` — controls whether a "Create" item appears at the top of the dropdown when the typed value isn't in `items`. Independent of `searchable`, but only useful when paired with it (autocomplete + `createNew`).
+
+This split fixes a real bug: the previous design coupled "show typing input" to `allowCreate`, which meant `autocomplete` with `createNew: false` rendered identically to a `select` (no typing input), defeating the whole point of autocomplete.
 
 ### `_DropdownPicker.vue` — internal dropdown
 

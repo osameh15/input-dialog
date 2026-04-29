@@ -22,13 +22,13 @@ Native `<select>` was considered. Three reasons it's wrong here:
 2. **Autocomplete with create-new.** Native `<select>` and `<datalist>` don't support a "Create new" item with custom formatting + `+` icon + "New" badge. That's the whole point of the autocomplete field.
 3. **Search filtering.** Native `<datalist>` filters via prefix-only matching across all browsers. The custom dropdown supports substring search, which is what users expect.
 
-The custom `_DropdownPicker.vue` is small (~150 lines of script + 100 lines of CSS) and handles both modes — `select` (with `allowCreate: false`) and `autocomplete` (with `allowCreate: true`).
+The custom `_DropdownPicker.vue` is small (~190 lines of script + 130 lines of CSS) and handles both modes via two independent props: `searchable` (typing input visible, list filters as you type) and `allowCreate` (Create suggestion at the top when the typed value isn't in items). `select` uses `searchable: false, allowCreate: false`; `autocomplete` uses `searchable: true` plus `allowCreate` derived from the field's `createNew` setting.
 
 ## Why a single shared dropdown component?
 
 Could have been two components: `_Select.vue` and `_Autocomplete.vue`. The differences between them are tiny — autocomplete has an `<input>` for typing and shows a "Create" item; select has a static label and no "Create" item.
 
-Rather than maintain two near-duplicate components, one component branches on the `allowCreate` prop. Less code, single source of truth for dropdown styling, keyboard nav, click-outside, etc. The `_` prefix marks it as internal — it's not in the module's public component registry.
+Rather than maintain two near-duplicate components, one component branches on the `searchable` and `allowCreate` props. Less code, single source of truth for dropdown styling, keyboard nav, click-outside, etc. The `_` prefix marks it as internal — it's not in the module's public component registry.
 
 ## Why module-level state (not Pinia, not provide/inject)?
 
