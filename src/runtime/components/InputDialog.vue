@@ -658,38 +658,36 @@ defineExpose({
 
 /* ----- Fields -----
  *
- * Floating-label design: the label sits inside the input as a
- * "placeholder" when empty, and floats UP and ABOVE the input — into
- * the field wrapper's reserved top space — when the field is focused
- * or has a value.
+ * Filled floating-label design (Material "filled" variant). Both the
+ * label and the input text live INSIDE the input box.
  *
- * Compared to the Material "outlined" variant (label notched into the
- * top border), this approach skips the masked-background hack — the
- * label always sits in clear space, never overlapping the border.
- * It also avoids the Material "filled" variant pitfall where the
- * placeholder/cursor lives in the bottom half of the input because
- * the floated label takes the top half.
+ *   - Empty + unfocused: the label sits at the input's vertical
+ *     center, looking like a placeholder.
+ *   - Focused or filled: the label slides up to the top of the
+ *     input (still inside the box), shrinks to a small legend in
+ *     cyan. The actual typed text / placeholder occupies the area
+ *     below the floated label.
+ *
+ * The input's padding-top reserves space for the small floated label
+ * so the typed text and the floated label don't overlap.
  */
 .dialog-fields {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  margin-top: 18px;
+  gap: 14px;
+  margin-top: 20px;
 }
 
 .dialog-field {
   position: relative;
   display: flex;
   flex-direction: column;
-  /* Reserved space above the input where the floated label lives.
-   * Empty in default state, filled by the small label when focused/has-value. */
-  padding-top: 14px;
 }
 
 .dialog-input {
   width: 100%;
-  height: 48px;
-  padding: 0 14px;
+  height: 56px;
+  padding: 22px 14px 8px;
   background: rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(127, 157, 187, 0.5);
   border-radius: 8px;
@@ -722,12 +720,11 @@ defineExpose({
   background: rgba(0, 0, 0, 0.4);
 }
 
-/* Textarea — taller, plain horizontal+vertical padding so text starts
- * near the top and the cursor isn't visually pushed to the bottom. */
+/* Textarea — taller, inherits the input's `22px 14px 8px` padding so
+ * the floated label sits cleanly above the first text line. */
 .dialog-textarea {
   height: auto;
   min-height: 96px;
-  padding: 14px;
   resize: vertical;
   font-family: inherit;
   scrollbar-width: thin;
@@ -748,16 +745,19 @@ defineExpose({
   background: rgba(0, 255, 255, 0.5);
 }
 
-/* ----- Label — default ("placeholder") position -----
+/* ----- Label -----
  *
- * The label sits at the vertical center of the input area (which
- * starts at y = 14 because of the field's `padding-top: 14px`).
- * For an input that's 48px tall, the input vertical center is at
- * y = 14 + 24 = 38 from the field top.
+ * Default ("placeholder") position: vertically centered inside the
+ * input (`top: 50%` is the input box's vertical center because the
+ * field wrapper has no padding-top).
+ *
+ * Floated position: `top: 8px` — a small label at the top of the
+ * input, inside the box. The input's `padding-top: 22px` ensures
+ * the typed text / placeholder appears below this floated label.
  */
 .dialog-field-label {
   position: absolute;
-  top: 38px;
+  top: 50%;
   left: 14px;
   transform: translateY(-50%);
   max-width: calc(100% - 28px);
@@ -779,10 +779,9 @@ defineExpose({
 }
 
 /* Textarea label sits near the top of the textarea (matches where
- * the cursor / first line of text appears), since vertical-center
- * on a multi-line area looks odd. */
+ * the cursor / first line of text would naturally be). */
 .dialog-field.is-textarea .dialog-field-label {
-  top: 28px;
+  top: 22px;
   transform: none;
 }
 
@@ -792,17 +791,12 @@ defineExpose({
   right: 14px;
 }
 
-/*
- * Floating state — label slides UP into the field's reserved
- * `padding-top: 14px` zone, sitting cleanly ABOVE the input border.
- * No background mask is needed because the label is in clear space,
- * never overlapping the input.
- */
+/* Floating state — label small at the top INSIDE the input */
 .dialog-field:focus-within .dialog-field-label,
 .dialog-field.has-value .dialog-field-label {
-  top: 0;
+  top: 8px;
   transform: none;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.04em;
   color: rgba(0, 255, 255, 0.85);
