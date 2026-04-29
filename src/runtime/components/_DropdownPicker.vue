@@ -25,6 +25,7 @@
         class="dd-input dd-input-search"
         @focus="open"
         @input="onInput"
+        @blur="onInputBlur"
         @keydown.stop="onInputKeydown"
       >
       <span
@@ -213,10 +214,32 @@ const open = (): void => {
   isOpen.value = true
   activeIndex.value = displayItems.value.findIndex(item => item.value === props.modelValue)
 }
-const close = (): void => {
+
+/**
+ * Close the dropdown and (when searchable) sync `searchText` back to
+ * the committed `modelValue`. Without this sync, typing in autocomplete
+ * and clicking away without picking left stale text in the input that
+ * overlapped the floating label.
+ *
+ * `committed` short-circuits the sync — used by `pick()` so it doesn't
+ * overwrite the value just emitted (Vue prop updates are async, so
+ * reading `props.modelValue` right after emit returns stale).
+ */
+const close = (committed?: string): void => {
   isOpen.value = false
   activeIndex.value = -1
+  if (props.searchable) {
+    const target = committed !== undefined
+      ? committed
+      : (props.modelValue !== undefined && props.modelValue !== null
+          ? String(props.modelValue)
+          : '')
+    if (searchText.value !== target) {
+      searchText.value = target
+    }
+  }
 }
+
 const toggle = async (): Promise<void> => {
   if (isOpen.value) {
     close()
@@ -228,12 +251,24 @@ const toggle = async (): Promise<void> => {
   }
 }
 
+/**
+ * Tab-away (or any other blur of the search input) closes the dropdown
+ * and resets stray search text. Mousedown on a list item uses
+ * `mousedown.prevent` so blur doesn't fire there — a click on an item
+ * keeps focus on the input until `pick()` runs.
+ */
+const onInputBlur = (): void => {
+  // Defer so any click-on-item / Enter-on-item completes first.
+  setTimeout(() => {
+    if (rootRef.value && !rootRef.value.contains(document.activeElement)) {
+      close()
+    }
+  }, 0)
+}
+
 const pick = (item: DisplayItem): void => {
   emit('update:modelValue', item.value)
-  if (props.searchable) {
-    searchText.value = String(item.value)
-  }
-  close()
+  close(String(item.value))
 }
 
 const onInput = (): void => {
@@ -318,14 +353,14 @@ onBeforeUnmount(() => {
   gap: 8px;
   width: 100%;
   height: 56px;
-  padding: 22px 14px 8px;
+  padding: 0 14px;
   background: rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(127, 157, 187, 0.5);
   border-radius: 8px;
   color: white;
   font-size: 14px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
   box-sizing: border-box;
 }
 

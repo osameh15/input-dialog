@@ -536,6 +536,15 @@ defineExpose({
 
 /* ----- Card ----- */
 .dialog-card {
+  /*
+   * `--dialog-mask-bg` is the solid color used by the floating label to
+   * mask the input's top border, creating the "notched outline" look
+   * (Material outlined variant). It approximates the card's lower
+   * gradient color where most input rows live, so the masked spot
+   * blends with the surrounding card.
+   */
+  --dialog-mask-bg: #1d2632;
+
   position: relative;
   width: 100%;
   max-width: 520px;
@@ -671,35 +680,36 @@ defineExpose({
 }
 
 /*
- * Floating-label inputs.
+ * Outlined floating-label inputs (Material outlined / Vuetify
+ * v-text-field outlined variant).
  *
- * The label is positioned absolutely on top of the input. Default state
- * (empty + unfocused): vertically centered, looks like a placeholder.
- * Focused or filled state: shrinks and slides up to the top of the
- * input, sits above the value as a small legend in the active accent
- * color.
+ * The label is positioned absolutely. Default state (empty +
+ * unfocused): vertically centered inside the input, looking like a
+ * placeholder. Focused or filled state: slides up to sit ON the top
+ * border ("notched") with a solid background that masks the border
+ * behind it.
  *
- * The control is rendered BEFORE the label in the DOM so that
- * `:focus-within` on the parent + the `.has-value` class drive the
- * floating state via plain CSS — no JS for the animation.
+ * The control is rendered BEFORE the label in the DOM so
+ * `:focus-within` on the parent + the `.has-value` class can drive
+ * the float animation via plain CSS — no JS.
  */
 .dialog-input {
   width: 100%;
   height: 56px;
-  padding: 22px 14px 8px;
+  padding: 0 14px;
   background: rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(127, 157, 187, 0.5);
   border-radius: 8px;
   color: white;
   font-size: 14px;
   font-family: inherit;
-  transition: all 0.15s ease;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
   box-sizing: border-box;
 }
 
-/* The native placeholder is hidden by default so the label can act
- * as the visual placeholder. It shows only when the field is focused
- * (via the float state below). */
+/* Hide the native placeholder by default — the label acts as
+ * the placeholder. The placeholder shows only when focused (under
+ * the floated label), matching Vuetify's behavior. */
 .dialog-input::placeholder {
   color: transparent;
   transition: color 0.15s ease;
@@ -719,19 +729,18 @@ defineExpose({
   background: rgba(0, 0, 0, 0.4);
 }
 
-/* Textarea — taller, label sits at top instead of vertically centered */
+/* Textarea — taller, top-padded slightly more so multi-line content
+ * doesn't bump into the border-line where the label notches. */
 .dialog-textarea {
   height: auto;
   min-height: 96px;
-  padding: 26px 14px 8px;
+  padding: 14px 14px;
   resize: vertical;
   font-family: inherit;
-  /* Firefox */
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 255, 255, 0.3) rgba(0, 0, 0, 0.2);
 }
 
-/* WebKit / Blink scrollbars inside the textarea */
 .dialog-textarea::-webkit-scrollbar {
   width: 6px;
 }
@@ -746,29 +755,37 @@ defineExpose({
   background: rgba(0, 255, 255, 0.5);
 }
 
-/* The label — default ("placeholder") position */
+/* ----- Label — default ("placeholder") position ----- */
 .dialog-field-label {
   position: absolute;
   top: 50%;
   left: 14px;
   transform: translateY(-50%);
+  max-width: calc(100% - 28px);
+  padding: 0 4px;
   font-size: 14px;
   font-weight: 400;
   color: rgba(255, 255, 255, 0.55);
   letter-spacing: 0.01em;
+  line-height: 1.2;
   pointer-events: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   background: transparent;
   transition:
     top 0.18s ease,
     transform 0.18s ease,
     font-size 0.18s ease,
     color 0.18s ease,
-    font-weight 0.18s ease;
+    background 0.18s ease;
 }
 
-/* Textarea label sits at the top instead of vertically centered */
+/* Textarea label sits near the top (line height 1) of the textarea
+ * before floating, since vertical-center on a multi-line area looks
+ * odd. */
 .dialog-field.is-textarea .dialog-field-label {
-  top: 18px;
+  top: 14px;
   transform: none;
 }
 
@@ -779,22 +796,26 @@ defineExpose({
 }
 
 /*
- * Floating state — when the field is focused or has a value, the label
- * slides up and shrinks. `:focus-within` covers nested controls
- * (the dropdown picker's input). `.has-value` is set by InputDialog
- * when the field's value is non-empty.
+ * Floating state — the label slides up to sit ON the top border. A
+ * solid background colored to match the card masks the border line
+ * behind the label, creating the "notched outline" look.
+ *
+ * `:focus-within` covers nested controls (the dropdown picker's
+ * inner input). `.has-value` is set by InputDialog when the field's
+ * value is non-empty.
  */
 .dialog-field:focus-within .dialog-field-label,
 .dialog-field.has-value .dialog-field-label {
-  top: 8px;
-  transform: none;
+  top: 0;
+  transform: translateY(-50%);
   font-size: 11px;
   font-weight: 500;
-  color: rgba(0, 255, 255, 0.85);
   letter-spacing: 0.04em;
+  color: rgba(0, 255, 255, 0.85);
+  background: var(--dialog-mask-bg);
 }
 
-/* Active focus highlight (slightly stronger) */
+/* Active focus — slightly stronger color and tighter padding */
 .dialog-field:focus-within .dialog-field-label {
   color: #00ffff;
 }
