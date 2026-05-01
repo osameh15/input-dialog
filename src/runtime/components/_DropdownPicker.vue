@@ -354,10 +354,10 @@ onBeforeUnmount(() => {
   width: 100%;
   height: 56px;
   padding: 22px 14px 8px;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(127, 157, 187, 0.5);
+  background: var(--input-field-bg);
+  border: 1px solid var(--input-field-border);
   border-radius: 8px;
-  color: white;
+  color: var(--input-title-color);
   font-size: 14px;
   cursor: pointer;
   transition: border-color 0.15s ease, background-color 0.15s ease;
@@ -369,14 +369,14 @@ onBeforeUnmount(() => {
 }
 
 .dd-trigger:hover {
-  border-color: rgba(255, 255, 255, 0.45);
+  border-color: var(--input-field-border-hover);
 }
 
 .dd-trigger:focus,
 .dd-root.is-open .dd-trigger {
   outline: none;
   border-color: #00ffff;
-  background: rgba(0, 0, 0, 0.4);
+  background: var(--input-field-bg-focus);
 }
 
 .dd-input-search {
@@ -384,7 +384,7 @@ onBeforeUnmount(() => {
   background: transparent;
   border: 0;
   outline: none;
-  color: white;
+  color: var(--input-title-color);
   font-size: 14px;
   font-family: inherit;
   padding: 0;
@@ -413,7 +413,7 @@ onBeforeUnmount(() => {
 
 .dd-caret {
   display: inline-flex;
-  color: rgba(255, 255, 255, 0.55);
+  color: var(--input-field-label-default);
   transition: transform 0.18s ease, color 0.15s ease;
   flex-shrink: 0;
 }
@@ -432,16 +432,12 @@ onBeforeUnmount(() => {
   z-index: 10;
   max-height: 220px;
   overflow-y: auto;
-  background: radial-gradient(
-    120% 104.06% at 50.07% -4%,
-    rgba(51, 78, 104, 0.98) 1.9%,
-    rgba(25, 29, 35, 0.98) 100%
-  );
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: var(--input-dd-panel-bg);
+  border: 1px solid var(--input-dd-panel-border);
   -webkit-backdrop-filter: blur(12.5px);
   backdrop-filter: blur(12.5px);
   border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--input-dd-panel-shadow);
 }
 
 .dd-fade-enter-active,
@@ -466,7 +462,7 @@ onBeforeUnmount(() => {
   gap: 8px;
   min-height: 36px;
   padding: 8px 12px;
-  color: rgba(255, 255, 255, 0.92);
+  color: var(--input-dd-item-color);
   cursor: pointer;
   border-radius: 6px;
   font-size: 14px;
@@ -476,17 +472,17 @@ onBeforeUnmount(() => {
 
 .dd-item.is-active,
 .dd-item:hover {
-  background: rgba(0, 255, 255, 0.15);
+  background: var(--input-dd-item-hover-bg);
 }
 
 .dd-item.is-selected {
-  background: rgba(0, 255, 255, 0.25);
-  color: #00ffff;
+  background: var(--input-dd-item-selected-bg);
+  color: var(--input-field-label-floated);
   font-weight: 600;
 }
 
 .dd-item.is-empty {
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--input-dd-item-empty-color);
   cursor: default;
 }
 .dd-item.is-empty:hover {

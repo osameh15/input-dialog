@@ -17,6 +17,7 @@
       :buttons="currentDialog.buttons"
       :close-on-backdrop-click="closeOnBackdropClick"
       :escape-to-cancel="escapeToCancel"
+      :theme="effectiveTheme"
       @confirm="onConfirm"
       @cancel="onCancel"
       @action="onAction"
@@ -25,10 +26,11 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import InputDialog from './InputDialog.vue'
 import { useInputDialog } from '../composables/useInputDialog'
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     /**
      * Render into `document.body` via `<Teleport>` so the overlay always
@@ -40,15 +42,24 @@ withDefaults(
     closeOnBackdropClick?: boolean
     /** Pressing Escape cancels the dialog. Defaults to `true`. */
     escapeToCancel?: boolean
+    /**
+     * Override the global theme for this container. When set, takes
+     * precedence over `useInputDialog().theme`. Defaults to following
+     * the global theme (which is `'dark'` until changed via `setTheme`).
+     */
+    theme?: 'dark' | 'light'
   }>(),
   {
     teleport: true,
     closeOnBackdropClick: false,
     escapeToCancel: true,
+    theme: undefined,
   },
 )
 
-const { currentDialog, confirm, cancel, action } = useInputDialog()
+const { currentDialog, confirm, cancel, action, theme: globalTheme } = useInputDialog()
+
+const effectiveTheme = computed<'dark' | 'light'>(() => props.theme ?? globalTheme.value)
 
 const onConfirm = (values: Record<string, unknown>): void => confirm(values)
 const onCancel = (): void => cancel()

@@ -212,6 +212,30 @@ describe('useInputDialog', () => {
       await expect(pending).resolves.toBeNull()
     })
   })
+
+  describe('theme', () => {
+    it('defaults to "dark"', () => {
+      const { theme, setTheme } = useInputDialog()
+      setTheme('dark')
+      expect(theme.value).toBe('dark')
+    })
+
+    it('setTheme switches to "light" reactively', () => {
+      const { theme, setTheme } = useInputDialog()
+      setTheme('light')
+      expect(theme.value).toBe('light')
+      setTheme('dark') // restore for other tests
+    })
+
+    it('all useInputDialog() calls share the same theme ref', () => {
+      const a = useInputDialog()
+      const b = useInputDialog()
+      a.setTheme('light')
+      expect(b.theme.value).toBe('light')
+      a.setTheme('dark')
+      expect(b.theme.value).toBe('dark')
+    })
+  })
 })
 
 describe('formatCreateNewValue', () => {

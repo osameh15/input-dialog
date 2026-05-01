@@ -10,6 +10,11 @@ export interface ModuleOptions {
   /** Component name prefix. Defaults to `Input` (so components are `<InputDialog>` and `<InputDialogContainer>`). */
   prefix?: string
   /**
+   * Initial visual theme. Can be changed at runtime via
+   * `useInputDialog().setTheme(...)`. Defaults to `'dark'`.
+   */
+  theme?: 'dark' | 'light'
+  /**
    * If true, an `<InputDialogContainer>` is mounted automatically on the
    * client and you only need to call `useInputDialog()`. If false, mount
    * `<InputDialogContainer />` yourself somewhere in your app
@@ -43,6 +48,7 @@ declare module '@nuxt/schema' {
     inputDialog: {
       closeOnBackdropClick: boolean
       escapeToCancel: boolean
+      theme: 'dark' | 'light'
     }
   }
 }
@@ -60,6 +66,7 @@ export default defineNuxtModule<ModuleOptions>({
     autoMount: true,
     closeOnBackdropClick: false,
     escapeToCancel: true,
+    theme: 'dark',
     loadShabnamFont: true,
     loadInterFont: true,
   },
@@ -69,7 +76,12 @@ export default defineNuxtModule<ModuleOptions>({
     nuxt.options.runtimeConfig.public.inputDialog = {
       closeOnBackdropClick: options.closeOnBackdropClick!,
       escapeToCancel: options.escapeToCancel!,
+      theme: options.theme!,
     }
+
+    // Theme variables — must always load so var(--input-*) resolves.
+    nuxt.options.css = nuxt.options.css || []
+    nuxt.options.css.push(resolver.resolve('./runtime/assets/styles/input-dialog-theme.css'))
 
     addComponent({
       name: `${options.prefix}Dialog`,
@@ -86,7 +98,6 @@ export default defineNuxtModule<ModuleOptions>({
     })
 
     if (options.loadShabnamFont) {
-      nuxt.options.css = nuxt.options.css || []
       nuxt.options.css.push(resolver.resolve('./runtime/assets/styles/input-dialog-fonts.css'))
     }
 

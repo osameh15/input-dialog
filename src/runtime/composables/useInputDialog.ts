@@ -1,6 +1,8 @@
-import { ref } from 'vue'
+import { ref, readonly } from 'vue'
 
 export type InputDialogType = 'success' | 'warning' | 'error' | 'info'
+
+export type InputDialogTheme = 'dark' | 'light'
 
 export type InputFieldType
   = | 'text'
@@ -89,6 +91,16 @@ export interface InputDialogResult {
 
 const currentDialog = ref<InputDialogInstance | null>(null)
 let resolveResult: ((result: InputDialogResult) => void) | null = null
+
+const theme = ref<InputDialogTheme>('dark')
+
+/** Switch the global theme. Reactive — every container re-renders. */
+const setTheme = (next: InputDialogTheme): void => {
+  theme.value = next
+}
+
+/** Internal: invoked by the auto-mount plugin to seed the theme from module options. */
+export const _setInputDialogTheme = setTheme
 
 export const useInputDialog = () => {
   const show = (options: InputDialogOptions): Promise<InputDialogResult> => {
@@ -382,6 +394,10 @@ export const useInputDialog = () => {
     promptSaveAs,
     /** Multi-field form. Resolves with values or `null` on cancel. */
     promptForm,
+    /** Reactive global theme — `'dark'` or `'light'`. Read-only. */
+    theme: readonly(theme),
+    /** Switch theme at runtime. All containers reactively pick up the change. */
+    setTheme,
   }
 }
 

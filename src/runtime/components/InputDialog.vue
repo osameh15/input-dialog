@@ -3,6 +3,7 @@
     <div
       v-if="isVisible"
       class="dialog-overlay"
+      :data-theme="theme"
       role="presentation"
       @mousedown.self="onBackdropClick"
     >
@@ -223,10 +224,13 @@ const props = withDefaults(
     buttons?: InputDialogButton[] | null
     closeOnBackdropClick?: boolean
     escapeToCancel?: boolean
+    /** Visual theme — `'dark'` (default) or `'light'`. */
+    theme?: 'dark' | 'light'
   }>(),
   {
     modelValue: false,
     type: 'info',
+    theme: 'dark',
     message: null,
     initialValues: () => ({}),
     warningText: null,
@@ -510,7 +514,7 @@ defineExpose({
   align-items: safe center;
   justify-content: center;
   padding: 48px 16px;
-  background: rgba(15, 18, 24, 0.78);
+  background: var(--input-overlay-bg);
   -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
   overflow-y: auto;
@@ -541,16 +545,12 @@ defineExpose({
   max-width: 520px;
   margin-top: 32px;
   padding: 60px 32px 32px;
-  background: radial-gradient(
-    120% 104.06% at 50.07% -4%,
-    rgba(51, 78, 104, 0.98) 1.9%,
-    rgba(25, 29, 35, 0.98) 100%
-  );
+  background: var(--input-card-bg);
   -webkit-backdrop-filter: blur(12.5px);
   backdrop-filter: blur(12.5px);
   border-radius: 12px;
-  color: white;
-  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.55);
+  color: var(--input-title-color);
+  box-shadow: var(--input-card-shadow);
   font-family:
     'Inter',
     'Shabnam',
@@ -592,11 +592,7 @@ defineExpose({
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(
-    120% 104.06% at 50.07% -4%,
-    rgba(51, 78, 104, 0.98) 1.9%,
-    rgba(25, 29, 35, 0.98) 100%
-  );
+  background: var(--input-icon-circle-bg);
   -webkit-backdrop-filter: blur(12.5px);
   backdrop-filter: blur(12.5px);
   z-index: 10;
@@ -631,7 +627,7 @@ defineExpose({
   font-size: 20px;
   font-weight: 600;
   margin: 0 0 12px;
-  color: white;
+  color: var(--input-title-color);
   text-align: center;
   line-height: 1.3;
   font-family: inherit;
@@ -641,7 +637,7 @@ defineExpose({
   font-size: 15px;
   line-height: 1.6;
   margin: 0;
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--input-message-color);
   text-align: center;
   font-family: inherit;
 }
@@ -651,7 +647,7 @@ defineExpose({
   font-weight: 500;
   line-height: 1.5;
   margin: 12px 0 0;
-  color: #ffd700;
+  color: var(--input-warning-color);
   text-align: center;
   font-family: inherit;
 }
@@ -688,10 +684,10 @@ defineExpose({
   width: 100%;
   height: 56px;
   padding: 22px 14px 8px;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(127, 157, 187, 0.5);
+  background: var(--input-field-bg);
+  border: 1px solid var(--input-field-border);
   border-radius: 8px;
-  color: white;
+  color: var(--input-title-color);
   font-size: 14px;
   font-family: inherit;
   transition: border-color 0.15s ease, background-color 0.15s ease;
@@ -707,17 +703,17 @@ defineExpose({
 }
 
 .dialog-input:focus::placeholder {
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--input-field-label-default);
 }
 
 .dialog-input:hover {
-  border-color: rgba(255, 255, 255, 0.45);
+  border-color: var(--input-field-border-hover);
 }
 
 .dialog-input:focus {
   outline: none;
   border-color: #00ffff;
-  background: rgba(0, 0, 0, 0.4);
+  background: var(--input-field-bg-focus);
 }
 
 /* Textarea — taller, inherits the input's `22px 14px 8px` padding so
@@ -767,7 +763,7 @@ defineExpose({
   max-width: calc(100% - 28px);
   font-size: 14px;
   font-weight: 400;
-  color: rgba(255, 255, 255, 0.55);
+  color: var(--input-field-label-default);
   letter-spacing: 0.01em;
   line-height: 1.2;
   pointer-events: none;
@@ -803,7 +799,7 @@ defineExpose({
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.04em;
-  color: rgba(0, 255, 255, 0.85);
+  color: var(--input-field-label-floated);
 }
 
 /* Active focus — slightly stronger color */
@@ -835,7 +831,7 @@ defineExpose({
 .dialog-field-hint {
   font-size: 12px;
   margin: 6px 0 0;
-  color: rgba(255, 255, 255, 0.55);
+  color: var(--input-hint-color);
 }
 
 .dialog-field-error {
@@ -851,8 +847,8 @@ defineExpose({
   margin: 4px 0 0;
   padding: 8px 12px;
   color: #ef5350;
-  background: rgba(239, 83, 80, 0.12);
-  border: 1px solid rgba(239, 83, 80, 0.3);
+  background: var(--input-form-error-bg);
+  border: 1px solid var(--input-form-error-border);
   border-radius: 6px;
   display: flex;
   align-items: center;
@@ -885,11 +881,11 @@ defineExpose({
   cursor: pointer;
   transition: all 0.15s ease;
   font-family: inherit;
-  color: white;
+  color: var(--input-title-color);
 }
 
 .dialog-btn:focus-visible {
-  outline: 2px solid rgba(0, 255, 255, 0.6);
+  outline: 2px solid var(--input-focus-outline);
   outline-offset: 2px;
 }
 
@@ -900,13 +896,13 @@ defineExpose({
 
 .dialog-btn-outlined {
   background: transparent;
-  border-color: rgba(255, 255, 255, 0.3);
-  color: rgba(255, 255, 255, 0.9);
+  border-color: var(--input-btn-outline-border);
+  color: var(--input-btn-outline-color);
   font-weight: 500;
 }
 .dialog-btn-outlined:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.5);
+  background: var(--input-btn-outline-hover-bg);
+  border-color: var(--input-btn-outline-hover-border);
 }
 
 .dialog-btn-flat {
@@ -921,6 +917,6 @@ defineExpose({
 .dialog-btn-error:hover:not(:disabled) { background: #c01234; }
 .dialog-btn-info { background: #00ffff; color: #003c3c; }
 .dialog-btn-info:hover:not(:disabled) { background: #00e6e6; }
-.dialog-btn-default { background: rgba(255, 255, 255, 0.12); color: white; }
-.dialog-btn-default:hover:not(:disabled) { background: rgba(255, 255, 255, 0.2); }
+.dialog-btn-default { background: var(--input-btn-default-bg); color: var(--input-btn-default-color); }
+.dialog-btn-default:hover:not(:disabled) { background: var(--input-btn-default-hover-bg); }
 </style>

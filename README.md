@@ -34,6 +34,7 @@ A beautiful, zero-dependency input dialog module for **Nuxt 3 and Nuxt 4** — n
 - [Autocomplete with create-new](#autocomplete-with-create-new)
 - [Custom buttons](#custom-buttons)
 - [Component API](#component-api)
+- [Theme](#theme)
 - [Customization](#customization)
 - [TypeScript](#typescript)
 - [Development](#development)
@@ -128,6 +129,7 @@ export default defineNuxtConfig({
 | `closeOnBackdropClick` | `boolean` | `false`     | Backdrop click cancels. Default off so a misclick doesn't lose typed data. |
 | `escapeToCancel`       | `boolean` | `true`      | Escape key cancels. |
 | `prefix`               | `string`  | `'Input'`   | Component name prefix. With the default, components are `<InputDialog>` and `<InputDialogContainer>`. |
+| `theme`                | `'dark' \| 'light'` | `'dark'` | Initial visual theme. Switch at runtime with `useInputDialog().setTheme(...)` or override per-container with the `theme` prop. |
 | `loadShabnamFont`      | `boolean` | `true`      | Inject the bundled Persian "Shabnam" font (gated by `unicode-range`). |
 | `loadInterFont`        | `boolean` | `true`      | Add Inter (Google Fonts) via a `<link>` in the head. |
 
@@ -340,6 +342,42 @@ The container that renders the active dialog. Auto-mounted by default — only u
 The single-dialog component. You normally don't render this directly — `useInputDialog()` and `<InputDialogContainer>` handle it. Exposed for static / non-composable usage with `v-model`.
 
 Emits: `update:modelValue`, `confirm` (with values), `cancel`, `action` (with name + values).
+
+---
+
+## Theme
+
+Ships with a **dark** theme (default) and a **light** theme. Switch globally at runtime, or override per-container.
+
+```ts
+// nuxt.config.ts — initial theme
+inputDialog: { theme: 'light' }
+```
+
+```vue
+<script setup lang="ts">
+const dialog = useInputDialog()
+
+console.log(dialog.theme.value) // 'dark' or 'light'
+
+dialog.setTheme('light')
+
+// Optional: follow the user's system preference
+const sync = () => dialog.setTheme(
+  window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light',
+)
+sync()
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', sync)
+</script>
+```
+
+Per-container override:
+
+```vue
+<InputDialogContainer theme="light" />
+```
+
+The `theme` prop, when set, takes precedence over `useInputDialog().theme`. Type-color borders (`#30e0a1` / `#FFD700` / `#DC143C` / `#00FFFF`) stay constant in both themes — only the card, overlay backdrop, input field colors, dropdown panel, and outlined-button neutrals swap.
 
 ---
 
