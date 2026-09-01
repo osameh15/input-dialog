@@ -1,0 +1,255 @@
+{
+  "$schema": "https://raw.githubusercontent.com/osameh15/osameh.dev/main/portfolio.schema.json",
+  "schemaVersion": "1.0.0",
+  "project": {
+    "slug": "input-dialog",
+    "name": "Nuxt Input Dialog",
+    "tagline": "Promise-based typed input dialogs for Nuxt applications.",
+    "summary": "A reusable Nuxt 3/4 dialog module for prompting users for text, passwords, email, numbers, textarea, selects and autocomplete values with validation, keyboard navigation and automatic RTL support.",
+    "type": "Nuxt module / UI library",
+    "lifecycle": "maintained",
+    "featured": true,
+    "featuredOrder": 6,
+    "legacy": false
+  },
+  "ownership": {
+    "role": "Author & Maintainer",
+    "collaboration": "solo",
+    "organization": null,
+    "responsibilities": [
+      "Module architecture",
+      "Promise-based API design",
+      "Validation system",
+      "Autocomplete behavior",
+      "Accessibility",
+      "RTL support",
+      "Testing",
+      "Documentation"
+    ]
+  },
+  "links": {
+    "repository": "https://github.com/osameh15/input-dialog",
+    "live": null,
+    "demo": null,
+    "documentation": "https://github.com/osameh15/input-dialog/tree/main/docs",
+    "package": "nuxt-input-dialog"
+  },
+  "repository": {
+    "owner": "osameh15",
+    "defaultBranch": "main",
+    "license": "MIT",
+    "name": "input-dialog"
+  },
+  "stack": {
+    "languages": [
+      "TypeScript",
+      "Vue"
+    ],
+    "frameworks": [
+      "Nuxt 3",
+      "Nuxt 4",
+      "Vue 3"
+    ],
+    "libraries": [],
+    "platforms": [
+      "Web"
+    ],
+    "databases": [],
+    "tooling": [
+      "Vitest",
+      "GitHub Actions",
+      "npm"
+    ],
+    "concepts": [
+      "Promise-based UI",
+      "Form validation",
+      "Autocomplete",
+      "Focus management",
+      "RTL/LTR"
+    ]
+  },
+  "caseStudy": {
+    "problem": "Applications repeatedly need small input workflows, but ad-hoc dialogs create duplicated validation, focus, cancellation and accessibility logic.",
+    "solution": "Provide a typed, promise-based dialog API that turns common prompts and multi-field forms into awaitable operations while keeping rendering and focus management centralized.",
+    "highlights": [
+      "Seven field types",
+      "Validation rules",
+      "Autocomplete with create-new",
+      "Custom 1/2/3-button layouts",
+      "Automatic focus and restoration",
+      "Automatic Persian/Arabic RTL detection"
+    ],
+    "challenges": [
+      {
+        "title": "Imperative workflow on reactive UI",
+        "description": "Callers want to await a value while Vue renders a reactive dialog.",
+        "resolution": "Bridge the UI lifecycle with promise resolution and centrally managed dialog state."
+      },
+      {
+        "title": "Reliable keyboard/focus behavior",
+        "description": "Dialogs should feel native and not lose user context.",
+        "resolution": "Focus the first field, support Enter/Escape, trap interaction and restore prior focus on close."
+      }
+    ],
+    "results": [
+      "Shared dialog behavior across Nuxt apps",
+      "Cleaner call sites through awaitable APIs",
+      "Reusable validation and autocomplete patterns"
+    ]
+  },
+  "architecture": {
+    "summary": "Consumer code calls an auto-imported composable; shared dialog state drives a container which renders fields, validates input and resolves the original promise.",
+    "nodes": [
+      {
+        "id": "consumer",
+        "label": "Nuxt application",
+        "type": "client"
+      },
+      {
+        "id": "api",
+        "label": "useInputDialog()",
+        "type": "api"
+      },
+      {
+        "id": "state",
+        "label": "Dialog state",
+        "type": "state"
+      },
+      {
+        "id": "container",
+        "label": "InputDialogContainer",
+        "type": "ui"
+      },
+      {
+        "id": "fields",
+        "label": "Dynamic fields + validation",
+        "type": "ui"
+      }
+    ],
+    "edges": [
+      {
+        "from": "consumer",
+        "to": "api",
+        "label": "awaits"
+      },
+      {
+        "from": "api",
+        "to": "state",
+        "label": "opens dialog"
+      },
+      {
+        "from": "state",
+        "to": "container",
+        "label": "renders"
+      },
+      {
+        "from": "container",
+        "to": "fields",
+        "label": "binds"
+      },
+      {
+        "from": "fields",
+        "to": "api",
+        "label": "resolves value/action"
+      }
+    ]
+  },
+  "media": {
+    "cover": {
+      "strategy": "first-gallery-image",
+      "path": null,
+      "alt": "Nuxt Input Dialog"
+    },
+    "gallery": {
+      "autoDiscover": true,
+      "include": [
+        "images/**",
+        "Images/**",
+        "docs/**",
+        "screenshots/**",
+        "Screenshots/**",
+        "media/**",
+        "assets/**",
+        "Assets/**"
+      ],
+      "exclude": [
+        "**/node_modules/**",
+        "**/vendor/**",
+        "**/dist/**",
+        "**/build/**",
+        "**/bin/**",
+        "**/obj/**",
+        "**/coverage/**",
+        "**/.cache/**",
+        "**/.git/**"
+      ],
+      "extensions": [
+        ".png",
+        ".jpg",
+        ".jpeg",
+        ".webp",
+        ".gif",
+        ".svg"
+      ],
+      "preferred": [
+        "docs/**",
+        "playground/**"
+      ]
+    },
+    "screenshots": []
+  },
+  "sourceExplorer": {
+    "enabled": true,
+    "maxFileSizeKb": 300,
+    "exclude": [
+      "node_modules/**",
+      "vendor/**",
+      "dist/**",
+      "build/**",
+      "bin/**",
+      "obj/**",
+      "coverage/**",
+      ".cache/**",
+      ".git/**",
+      "*.lock",
+      "*.min.js",
+      "*.map"
+    ],
+    "entryPoints": [
+      "package.json",
+      "src/module.ts",
+      "src/runtime/",
+      "test/"
+    ]
+  },
+  "recruiter": {
+    "headline": "Typed, promise-driven UX infrastructure for reusable Nuxt forms and prompts.",
+    "skillsDemonstrated": [
+      "TypeScript",
+      "Nuxt module authoring",
+      "Form UX",
+      "Validation",
+      "Accessibility",
+      "RTL UX",
+      "API design"
+    ],
+    "talkingPoints": [
+      "Turns dialog interactions into clean async workflows",
+      "Handles focus, keyboard, validation and RTL centrally",
+      "Designed for reuse across multiple applications"
+    ]
+  },
+  "seo": {
+    "title": "Nuxt Input Dialog — Osameh Irandoust",
+    "description": "A reusable Nuxt 3/4 dialog module for prompting users for text, passwords, email, numbers, textarea, selects and autocomplete values with validation, keyboard navigation and automatic RTL support.",
+    "keywords": [
+      "Nuxt",
+      "Vue",
+      "TypeScript",
+      "input dialog",
+      "form validation",
+      "autocomplete",
+      "RTL"
+    ]
+  }
+}
